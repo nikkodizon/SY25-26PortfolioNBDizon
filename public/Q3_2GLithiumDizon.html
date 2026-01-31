@@ -1,79 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<title>Club Sign-Up</title>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-    }
-
-    form {
-        width: 500px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-    }
-
-    fieldset {
-        margin-bottom: 15px;
-        padding: 15px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-    }
-
-    legend {
-        font-weight: bold;
-        padding: 0 5px;
-    }
-
-    label {
-        display: block;
-        margin-top: 10px;
-        font-weight: bold;
-    }
-
-    input, select, textarea {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        box-sizing: border-box;
-    }
-
-    input:focus, select:focus, textarea:focus {
-        border: 2px solid #007BFF;
-        background-color: #eef6ff;
-        outline: none;
-    }
-
-    .error {
-        border: 2px solid red;
-        background-color: #ffe6e6;
-    }
-
-    button {
-        margin-top: 15px;
-        padding: 10px;
-        width: 48%;
-    }
-
-    .radio-group {
-        display: flex;
-        gap: 20px;
-        margin-top: 5px;
-    }
-
-    .radio-group label {
-        font-weight: normal;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+    form { width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    fieldset { margin-bottom: 15px; padding: 15px; border: 2px solid #ccc; border-radius: 5px; }
+    legend { font-weight: bold; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    .error { border: 2px solid red; background-color: #ffe6e6; }
+    button { margin-top: 15px; padding: 10px; width: 48%; cursor: pointer; }
+    .view-btn { width: 100%; background-color: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; }
+    .radio-group { display: flex; gap: 20px; margin-top: 5px; }
 </style>
 
 <script>
-    function confirmSubmit() {
-        return confirm("Are you sure you want to submit this form?");
+    function handleSubmission(event) {
+        event.preventDefault();
+
+        if (!confirm("Are you sure you want to submit this form?")) return;
+
+        // Create signup object from form values
+        const newSignup = {
+            id: document.getElementsByName("studentid")[0].value,
+            name: document.getElementsByName("fullname")[0].value,
+            birth: document.getElementsByName("birthday")[0].value,
+            email: document.getElementsByName("email")[0].value,
+            phone: document.getElementsByName("mobilephone")[0].value,
+            grade: document.getElementsByName("grade_level")[0].value,
+            status: document.querySelector('input[name="intern_extern"]:checked').value,
+            club: document.getElementsByName("preferred_club")[0].value,
+            reason: document.querySelector("textarea").value
+        };
+
+        // Get existing signups or initialize empty array
+        let signups = JSON.parse(localStorage.getItem("clubSignups")) || [];
+
+        // Add new signup and save back to localStorage
+        signups.push(newSignup);
+        localStorage.setItem("clubSignups", JSON.stringify(signups));
+
+        alert("Record saved successfully!");
+        document.getElementById("signupForm").reset();
     }
 
     function confirmReset() {
@@ -87,32 +58,34 @@
             field.classList.remove("error");
         }
     }
+
+    // Prevent future dates for birthday
+    window.onload = function () {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementsByName("birthday")[0].max = today;
+    };
 </script>
 </head>
 
 <body>
-<form action="submit" method="post" onsubmit="return confirmSubmit()" onreset="return confirmReset()">
+
+<form id="signupForm" onsubmit="handleSubmission(event)" onreset="return confirmReset()">
 
     <fieldset>
         <legend>Personal Information</legend>
-
-        <label>
-            Student ID:
+        <label>Student ID:
             <input type="number" name="studentid" required onblur="checkEmpty(this)">
         </label>
 
-        <label>
-            Full Name (LASTNAME, FirstName MI.):
+        <label>Full Name:
             <input type="text" name="fullname" required onblur="checkEmpty(this)">
         </label>
 
-        <label>
-            Birthday:
-            <input type="date" name="birthday" required onblur="checkEmpty(this)">
+        <label>Birthday:
+            <input type="date" name="birthday" required>
         </label>
 
-        <label>
-            Email Address:
+        <label>Email Address:
             <input type="email" name="email" required onblur="checkEmpty(this)">
         </label>
     </fieldset>
@@ -120,15 +93,13 @@
     <fieldset>
         <legend>Additional Information</legend>
 
-        <label>
-            Mobile Phone:
+        <label>Mobile Phone:
             <input type="text" name="mobilephone" required onblur="checkEmpty(this)">
         </label>
 
-        <label>
-            Grade Level:
+        <label>Grade Level:
             <select name="grade_level" required onblur="checkEmpty(this)">
-                <option value="">-- Select an option --</option>
+                <option value="">-- Select --</option>
                 <option value="07">Grade 7</option>
                 <option value="08">Grade 8</option>
                 <option value="09">Grade 9</option>
@@ -140,20 +111,13 @@
 
         <label>Intern / Extern:</label>
         <div class="radio-group">
-            <label>
-                <input type="radio" name="intern_extern" value="Intern" required>
-                Intern
-            </label>
-            <label>
-                <input type="radio" name="intern_extern" value="Extern">
-                Extern
-            </label>
+            <label><input type="radio" name="intern_extern" value="Intern" required> Intern</label>
+            <label><input type="radio" name="intern_extern" value="Extern"> Extern</label>
         </div>
 
-        <label>
-            Preferred Organization / Club:
+        <label>Preferred Club:
             <select name="preferred_club" required onblur="checkEmpty(this)">
-                <option value="">--Select an option--</option>
+                <option value="">-- Select --</option>
                 <option value="sports">Sports Club</option>
                 <option value="art">Art Club</option>
                 <option value="music">Music Club</option>
@@ -162,14 +126,16 @@
             </select>
         </label>
 
-        <label>
-            Why do you want to join?
-            <textarea rows="5" required onblur="checkEmpty(this)" placeholder="Explain your reasons in detail..."></textarea>
+        <label>Why do you want to join?
+            <textarea rows="3" required onblur="checkEmpty(this)"></textarea>
         </label>
     </fieldset>
 
     <button type="submit">Submit</button>
     <button type="reset">Reset</button>
+    <button type="button" class="view-btn" onclick="window.location.href='viewSignUps.html'">
+        View Signups
+    </button>
 
 </form>
 </body>

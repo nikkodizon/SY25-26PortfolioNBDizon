@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>View Club Signups</title>
+
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; }
+    th { background-color: #007BFF; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .msg { font-weight: bold; color: #d9534f; text-align: center; margin-top: 20px; }
+    .total { font-size: 1.2em; font-weight: bold; }
+    .back-link { display: block; margin-top: 20px; text-align: center; text-decoration: none; color: #007BFF; }
+</style>
+</head>
+
+<body onload="renderTable()">
+
+<div class="container">
+    <h2>Club Membership List</h2>
+
+    <label>Filter by Club:</label>
+    <select id="clubDropdown" onchange="renderTable()">
+        <option value="all">ALL</option>
+        <option value="sports">Sports Club</option>
+        <option value="art">Art Club</option>
+        <option value="music">Music Club</option>
+        <option value="debate">Debate Club</option>
+        <option value="science">Science Club</option>
+    </select>
+
+    <div class="total" id="totalDisplay">Total Sign-ups: 0</div>
+    <div id="displayArea"></div>
+
+    <a href="Q3_2GLithiumDizon.html" class="back-link">Go back to Sign-Up Page</a>
+</div>
+
+<script>
+    function renderTable() {
+        const displayArea = document.getElementById("displayArea");
+        const totalDisplay = document.getElementById("totalDisplay");
+        const filter = document.getElementById("clubDropdown").value;
+
+        // Retrieve data from localStorage
+        let signups = JSON.parse(localStorage.getItem("clubSignups")) || [];
+
+        if (signups.length === 0) {
+            displayArea.innerHTML = "<p class='msg'>No sign-up data available.</p>";
+            totalDisplay.innerText = "Total Sign-ups: 0";
+            return;
+        }
+
+        // Filter signups by selected club
+        let filtered = (filter === "all")
+            ? signups
+            : signups.filter(s => s.club === filter);
+
+        if (filtered.length === 0) {
+            displayArea.innerHTML = "<p class='msg'>No sign-ups found for this club.</p>";
+            totalDisplay.innerText = "Total Sign-ups: 0";
+            return;
+        }
+
+        // Build table
+        let table = `<table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Grade</th>
+                <th>Club</th>
+                <th>Status</th>
+            </tr>`;
+
+        filtered.forEach(s => {
+            table += `<tr>
+                <td>${s.id}</td>
+                <td>${s.name}</td>
+                <td>${s.grade}</td>
+                <td>${s.club}</td>
+                <td>${s.status}</td>
+            </tr>`;
+        });
+
+        table += "</table>";
+        displayArea.innerHTML = table;
+        totalDisplay.innerText = "Total Sign-ups: " + filtered.length;
+    }
+</script>
+
+</body>
+</html>
