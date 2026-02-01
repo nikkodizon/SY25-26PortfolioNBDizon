@@ -23,7 +23,7 @@
 
         if (!confirm("Are you sure you want to submit this form?")) return;
 
-        // Create signup object from form values
+        
         const newSignup = {
             id: document.getElementsByName("studentid")[0].value,
             name: document.getElementsByName("fullname")[0].value,
@@ -36,10 +36,10 @@
             reason: document.querySelector("textarea").value
         };
 
-        // Get existing signups or initialize empty array
+
         let signups = JSON.parse(localStorage.getItem("clubSignups")) || [];
 
-        // Add new signup and save back to localStorage
+
         signups.push(newSignup);
         localStorage.setItem("clubSignups", JSON.stringify(signups));
 
@@ -59,7 +59,7 @@
         }
     }
 
-    // Prevent future dates for birthday
+
     window.onload = function () {
         const today = new Date().toISOString().split("T")[0];
         document.getElementsByName("birthday")[0].max = today;
