@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>View Club Signups</title>
+    <meta charset="UTF-8">
+    <title>View Club Signups</title>
 
-<style>
-    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 10px; }
-    th { background-color: #007BFF; color: white; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-    .msg { font-weight: bold; color: #d9534f; text-align: center; margin-top: 20px; }
-    .total { font-size: 1.2em; font-weight: bold; }
-    .back-link { display: block; margin-top: 20px; text-align: center; text-decoration: none; color: #007BFF; }
-</style>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007BFF; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .msg { font-weight: bold; color: #d9534f; text-align: center; margin-top: 20px; }
+        .total { font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+        .back-link { display: block; margin-top: 20px; text-align: center; text-decoration: none; color: #007BFF; font-weight: bold; }
+        select { padding: 5px; margin-left: 10px; }
+    </style>
 </head>
 
 <body onload="renderTable()">
@@ -44,7 +45,6 @@
         const totalDisplay = document.getElementById("totalDisplay");
         const filter = document.getElementById("clubDropdown").value;
 
-        // Retrieve data from localStorage
         let signups = JSON.parse(localStorage.getItem("clubSignups")) || [];
 
         if (signups.length === 0) {
@@ -53,7 +53,6 @@
             return;
         }
 
-        // Filter signups by selected club
         let filtered = (filter === "all")
             ? signups
             : signups.filter(s => s.club === filter);
@@ -64,23 +63,30 @@
             return;
         }
 
-        // Build table
         let table = `<table>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Birthday</th>
+                <th>Email</th>
+                <th>Phone</th>
                 <th>Grade</th>
-                <th>Club</th>
                 <th>Status</th>
+                <th>Club</th>
+                <th>Reason</th>
             </tr>`;
 
         filtered.forEach(s => {
             table += `<tr>
                 <td>${s.id}</td>
                 <td>${s.name}</td>
-                <td>${s.grade}</td>
-                <td>${s.club}</td>
+                <td>${s.birth}</td>
+                <td>${s.email}</td>
+                <td>${s.phone}</td>
+                <td>Grade ${s.grade}</td>
                 <td>${s.status}</td>
+                <td style="text-transform: capitalize;">${s.club}</td>
+                <td>${s.reason}</td>
             </tr>`;
         });
 
