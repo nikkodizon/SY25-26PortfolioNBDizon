@@ -72,6 +72,31 @@
             border-radius: 8px;
             font-size: 14px;
         }
+        .movie-card {
+            background: #fafafa;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+.delete-btn:hover {
+    background-color: #cc0000;
+}
 
         .list-stars { color: #ffcc00; }
     </style>
@@ -121,67 +146,95 @@
 </div>
 
 <script>
-    let currentRating = 0;
-    const stars = document.querySelectorAll('.star');
+let currentRating = 0;
+const stars = document.querySelectorAll('.star');
 
-
-    stars.forEach(star => {
-        star.addEventListener('click', () => {
-            currentRating = star.getAttribute('data-value');
-            updateStars(currentRating);
-        });
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        currentRating = parseInt(star.getAttribute('data-value'));
+        updateStars(currentRating);
     });
+});
 
-    function updateStars(val) {
-        stars.forEach(s => {
-            s.classList.toggle('active', s.getAttribute('data-value') <= val);
-        });
+function updateStars(val) {
+    stars.forEach(s => {
+        s.classList.toggle('active', s.getAttribute('data-value') <= val);
+    });
+}
+
+window.onload = showMovies;
+
+document.getElementById('addBtn').addEventListener('click', () => {
+    const titleVal = document.getElementById('title').value.trim();
+    const yearVal = document.getElementById('year').value.trim();
+    const genreVal = document.getElementById('genre').value;
+
+    if (!titleVal || !yearVal || currentRating === 0) {
+        alert("Please complete the form!");
+        return;
     }
 
+    let movies = JSON.parse(localStorage.getItem('movies')) || [];
+    
+    const existingIndex = movies.findIndex(m => 
+        m.title.toLowerCase() === titleVal.toLowerCase() && 
+        m.year.toString() === yearVal.toString()
+    );
 
-    window.onload = showMovies;
-
-
-    document.getElementById('addBtn').addEventListener('click', () => {
-        const titleVal = document.getElementById('title').value;
-        const yearVal = document.getElementById('year').value;
-        const genreVal = document.getElementById('genre').value;
-
-        if(!titleVal || !yearVal || currentRating === 0) {
-            alert("Please complete the form!");
-            return;
-        }
-
+    if (existingIndex !== -1) {
+        const oldRating = parseFloat(movies[existingIndex].rating);
+        const newAverage = (oldRating + currentRating) / 2;
+        
+        movies[existingIndex].genre = genreVal;
+        movies[existingIndex].rating = newAverage;
+    } else {
         const movieObj = {
             title: titleVal,
             year: yearVal,
             genre: genreVal,
             rating: currentRating
         };
-        let movies = JSON.parse(localStorage.getItem('movies')) || [];
         movies.push(movieObj);
-        localStorage.setItem('movies', JSON.stringify(movies));
-
-        document.getElementById('title').value = '';
-        document.getElementById('year').value = '';
-        currentRating = 0;
-        updateStars(0);
-        showMovies();
-    });
-
-    function showMovies() {
-        const display = document.getElementById('displayArea');
-        const movies = JSON.parse(localStorage.getItem('movies')) || [];
-        display.innerHTML = '';
-
-        movies.forEach(m => {
-            let starIcons = '★'.repeat(m.rating) + '☆'.repeat(5 - m.rating);
-            const div = document.createElement('div');
-            div.className = 'movie-card';
-            div.innerHTML = `${m.title} (${m.year}) - ${m.genre}, Rating: <span class="list-stars">${starIcons}</span>`;
-            display.appendChild(div);
-        });
     }
+
+    localStorage.setItem('movies', JSON.stringify(movies));
+
+    document.getElementById('title').value = '';
+    document.getElementById('year').value = '';
+    currentRating = 0;
+    updateStars(0);
+    showMovies();
+});
+
+function deleteMovie(index) {
+    if (confirm("Are you sure you want to delete?")) {
+        let movies = JSON.parse(localStorage.getItem('movies')) || [];
+        movies.splice(index, 1);
+        localStorage.setItem('movies', JSON.stringify(movies));
+        showMovies();
+    }
+}
+
+function showMovies() {
+    const display = document.getElementById('displayArea');
+    const movies = JSON.parse(localStorage.getItem('movies')) || [];
+    display.innerHTML = '';
+
+    movies.forEach((m, index) => {
+        const roundedRating = Math.round(m.rating);
+        let starIcons = '★'.repeat(roundedRating) + '☆'.repeat(5 - roundedRating);
+        
+        const div = document.createElement('div');
+        div.className = 'movie-card';
+        div.innerHTML = `
+            <div>
+                ${m.title} (${m.year}) - ${m.genre}, Rating: <span class="list-stars">${starIcons}</span>
+            </div>
+            <button class="delete-btn" onclick="deleteMovie(${index})">Delete</button>
+        `;
+        display.appendChild(div);
+    });
+}
 </script>
 
 </body>
