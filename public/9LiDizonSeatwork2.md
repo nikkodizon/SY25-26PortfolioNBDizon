@@ -20,7 +20,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="author" content="DIZONVIBAL" />
+  <meta name="author" content="DIZON" />
   <meta name="revised" content="March26-2026" />
   <style>
     body { font-family: Arial, sans-serif; }
